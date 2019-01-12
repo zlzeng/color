@@ -1,6 +1,6 @@
 from model import *
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # ignore warning messages from tf package
 

@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 
 infer_dir = './vis'
 
-os.environ['CUDA_VISIBLE_DEVICES'] = '0'
+os.environ['CUDA_VISIBLE_DEVICES'] = '1'
 
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2' # ignore warning messages from tf package
 
@@ -37,7 +37,10 @@ def main(_):
 			im = imread(im_paths[i], mode='RGB') / 255.
 			gt = imread(gt_paths[i], mode='RGB') / 255.
 
+			# im = imresize(im, (128, 256, 3)) / 255.
+
 			pred = model.inference(im, sess)
+			pred = imresize(pred, gt.shape)
 
 			plt.clf()
 			plt.subplot(211)

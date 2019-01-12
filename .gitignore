@@ -1,5 +1,5 @@
 # folder
-# dataset/*
+dataset/*
 tmp/*
 cnn/LOG
 gan/LOG

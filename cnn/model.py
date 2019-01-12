@@ -1,5 +1,6 @@
 from data_loader import *
 from net import *
+# from net_norm import *
 
 
 seed = 8964
@@ -18,12 +19,15 @@ class Model(object):
 		labels = data_dict['labels']
 
 		# initial network 
-		logits, _ = cnn(images)
+		logits, end_points = cnn(images)
 
 		# compute loss 
 		self.loss = tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(logits=logits, labels=labels, name='bce')) # normal bce loss		
+		# self.loss = tf.reduce_mean(tf.losses.mean_squared_error(labels=labels, predictions=tf.nn.sigmoid(logits), scope='mse')) # mean squared error	
 
 		# create train op
+		# update_ops = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+		# with tf.control_dependencies(update_ops):
 		self.optim = tf.train.AdamOptimizer(learning_rate=1e-4).minimize(self.loss, colocate_gradients_with_ops=True) # gradient ops assign to same device as forward ops
 
 		# collect summaries
@@ -32,9 +36,15 @@ class Model(object):
 		tf.summary.image('predict', tf.nn.sigmoid(logits)) 	
 		tf.summary.scalar('bce', self.loss)		
 
+		# collect mean feature score map
+		# tf.summary.image('cnv1', tf.reduce_mean(end_points['feature_net/cnv1'], axis=-1, keepdims=True))
+		# tf.summary.image('cnv1b', tf.reduce_mean(end_points['feature_net/cnv1b'], axis=-1, keepdims=True))
+		# tf.summary.image('cnv2', tf.reduce_mean(end_points['feature_net/cnv2'], axis=-1, keepdims=True))
+		# tf.summary.image('cnv2b', tf.reduce_mean(end_points['feature_net/cnv2b'], axis=-1, keepdims=True))
+
 		return data_dict['num_batch']
 
-	def train(self, max_step=40000):
+	def train(self, max_step=80000):
 		# build train graph
 		num_batch = self.build_train_graph()
 
@@ -94,7 +104,7 @@ class Model(object):
 		Use both inference and offline evaluation
 		"""
 		self.x = tf.placeholder(shape=shape, dtype=tf.float32)
-		logits, _ = cnn(self.x)
+		logits, _ = cnn(self.x, is_training=False)
 		self.infer = tf.nn.sigmoid(logits)
 
 	def inference(self, image, sess):

@@ -12,10 +12,10 @@ import glob
 import time
 import random
 
-train_file = '../dataset/train.txt'
-test_file = '../dataset/test.txt'
+train_file = '../dataset/train_c.txt'
+test_file = '../dataset/test_c.txt'
 
-def data_loader(batch_size=1, file=train_file, resize=None):
+def data_loader(batch_size=1, file=train_file, resize=False):
 	"""
 	Read pair of training set
 	Use fixed input size: [512x1024x3], gt size: [40x1024x3]
@@ -41,12 +41,12 @@ def data_loader(batch_size=1, file=train_file, resize=None):
 	label = tf.image.decode_png(tf.read_file(data_queue[1]), channels=3)
 
 	# resize to define image shape
-	if resize is None:
+	if not resize:
 		image = tf.reshape(image, [512, 1024, 3])
 		label = tf.reshape(label, [40, 1024, 3])
 	else:
-		image = tf.image.resize_images(image, resize)
-		label = tf.image.resize_images(label, resize)
+		image = tf.image.resize_images(image, (128, 256))
+		label = tf.image.resize_images(label, (10, 256))
 
 	# convert to float data type
 	image = tf.cast(image, dtype=tf.float32)	
