@@ -6,18 +6,6 @@ from tensorflow.contrib.layers.python.layers import utils
 
 def atrous_spatial_pyramid_pooling(inputs, output_stride=16, depth=256):
  	"""Atrous Spatial Pyramid Pooling.
-
-  	Args:
-		inputs: A tensor of size [batch, height, width, channels].
-		output_stride: Determines the rates for atrous convolution.
-	  		the rates are (6, 12, 18) when the stride is 16, and doubled when 8.
-		batch_norm_decay: The moving average decay when estimating layer activation
-	  		statistics in batch normalization.
-		is_training: A boolean denoting whether the input is for training.
-		depth: The depth of the ResNet unit output.
-
-  	Returns:
-		The atrous spatial pyramid pooling output.
 	"""
  	with tf.variable_scope("aspp"):
 		if output_stride not in [8, 16]:
@@ -68,13 +56,13 @@ def cnn(inputs, is_training=None):
 			cnv3b = slim.conv2d(cnv3,  128, [3, 3], stride=1, scope='cnv3b')
 			cnv4  = slim.conv2d(cnv3b, 256, [3, 3], stride=2, scope='cnv4')	 
 			cnv4b = slim.conv2d(cnv4,  256, [3, 3], stride=1, scope='cnv4b')
-			cnv5  = slim.conv2d(cnv4b, 512, [3, 3], stride=2, scope='cnv5') 
-			cnv5b = slim.conv2d(cnv5,  512, [3, 3], stride=1, scope='cnv5b')	
+			# cnv5  = slim.conv2d(cnv4b, 512, [3, 3], stride=2, scope='cnv5') 
+			# cnv5b = slim.conv2d(cnv5,  512, [3, 3], stride=1, scope='cnv5b')	
 
-			# aspp_pool = atrous_spatial_pyramid_pooling(cnv4b)
+			aspp_pool = atrous_spatial_pyramid_pooling(cnv4b)
 
 			with tf.variable_scope('fc'):
-				cnv6 = slim.conv2d(cnv5b, 512, [3, 3], stride=1, scope='cnv6')
+				cnv6 = slim.conv2d(aspp_pool, 512, [3, 3], stride=1, scope='cnv6')
 				cnv6b = slim.conv2d(cnv6, 512, [3, 3], stride=1, scope='cnv6b')
 				legend_pred = slim.conv2d(cnv6b, 3, [1, 1], stride=1, scope='pred',
 					normalizer_fn=None, activation_fn=None)
